@@ -4,6 +4,7 @@ import {
   Get,
   HttpCode,
   Post,
+  Put,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -11,6 +12,7 @@ import { SignupDto } from './dto/signup-user.dto';
 import { AuthService } from './auth.service';
 import { Request } from 'express';
 import { JwtAuthGuard } from './auth.guard';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -33,6 +35,15 @@ export class AuthController {
     const user = (req as any).user;
     return { user };
   }
+
+
+  @Put('update')
+  @UseGuards(JwtAuthGuard)
+  async updateUser(@Req() req: Request, @Body() updateUserDto: UpdateUserDto): Promise<{ message: string }> {
+    const user = (req as any).user;
+    return await this.authService.updateUser(user.id, updateUserDto);
+  }
+
 
   @Get('signout')
   @UseGuards(JwtAuthGuard)
