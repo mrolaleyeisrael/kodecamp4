@@ -3,7 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
 import { AppModule } from '../app.module';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateNoteDto } from '../notes/dto/create-note.dto';
+import { CreateNoteDto } from './dto/create-note.dto';
 import { JwtService } from '@nestjs/jwt';
 
 describe('Notes (e2e)', () => {
@@ -23,19 +23,18 @@ describe('Notes (e2e)', () => {
     prismaService = app.get(PrismaService);
     jwtService = app.get(JwtService);
 
-    // Create a test user and get JWT token
     const user = await prismaService.user.create({
       data: {
         username: 'testuser',
-        password: 'password', // assuming you have plain text password storage for testing purposes; otherwise, hash it.
+        password: 'password',
       },
     });
     token = await jwtService.signAsync({ id: user.id });
   });
 
   afterAll(async () => {
-    await prismaService.note.deleteMany(); // First, delete all notes
-    await prismaService.user.deleteMany(); // Then, delete all users
+    await prismaService.note.deleteMany();
+    await prismaService.user.deleteMany();
     await app.close();
   });
 
