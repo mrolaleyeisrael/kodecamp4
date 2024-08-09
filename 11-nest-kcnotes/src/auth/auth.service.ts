@@ -65,7 +65,10 @@ export class AuthService {
     };
   }
 
-  async updateUser(userId: string, updateUserDto: UpdateUserDto): Promise<{ message: string }> {
+  async updateUser(
+    userId: string,
+    updateUserDto: UpdateUserDto,
+  ): Promise<{ message: string }> {
     const { password } = updateUserDto;
     const salt = 10;
     const passwordHash = await bcrypt.hash(password, salt);
@@ -76,5 +79,20 @@ export class AuthService {
     });
 
     return { message: 'Password updated successfully' };
+  }
+  async deleteUser(userId: string): Promise<{ message: string }> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new BadRequestException(`User with id '${userId}' not found.`);
+    }
+
+    await this.prisma.user.delete({
+      where: { id: userId },
+    });
+
+    return { message: 'User deleted successfully' };
   }
 }

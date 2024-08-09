@@ -126,4 +126,35 @@ describe('AuthService', () => {
       });
     });
   });
+
+  describe('deleteUser', () => {
+    it('should throw an error if user is not found', async () => {
+      const userId = 'nonExistingUserId';
+
+      jest.spyOn(prismaService.user, 'findUnique').mockResolvedValue(null);
+
+      await expect(authService.deleteUser(userId)).rejects.toThrow(
+        new BadRequestException(`User with id '${userId}' not found.`),
+      );
+    });
+
+    it('should delete the user and return a success message', async () => {
+      const userId = 'existingUserId';
+      const existingUser = {
+        id: userId,
+        username: 'kodecamp',
+        password: 'hashedPassword',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      jest
+        .spyOn(prismaService.user, 'findUnique')
+        .mockResolvedValue(existingUser);
+      jest.spyOn(prismaService.user, 'delete').mockResolvedValue(existingUser);
+
+      const result = await authService.deleteUser(userId);
+      expect(result).toEqual({ message: 'User deleted successfully' });
+    });
+  })
 });

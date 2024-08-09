@@ -6,6 +6,7 @@ import {
   Post,
   Put,
   Req,
+  Delete,
   UseGuards,
 } from '@nestjs/common';
 import { SignupDto } from './dto/signup-user.dto';
@@ -36,14 +37,22 @@ export class AuthController {
     return { user };
   }
 
-
   @Put('update')
   @UseGuards(JwtAuthGuard)
-  async updateUser(@Req() req: Request, @Body() updateUserDto: UpdateUserDto): Promise<{ message: string }> {
+  async updateUser(
+    @Req() req: Request,
+    @Body() updateUserDto: UpdateUserDto,
+  ): Promise<{ message: string }> {
     const user = (req as any).user;
     return await this.authService.updateUser(user.id, updateUserDto);
   }
 
+  @Delete('delete')
+  @UseGuards(JwtAuthGuard)
+  async deleteUser(@Req() req: Request): Promise<{ message: string }> {
+    const userId = (req as any).user.id;
+    return await this.authService.deleteUser(userId);
+  }
 
   @Get('signout')
   @UseGuards(JwtAuthGuard)
